@@ -1,11 +1,14 @@
 "use client"
 
-import { Shield, Check } from "lucide-react"
+import { useState } from "react"
+import { Shield, Check, Wallet } from "lucide-react"
+import { motion } from "framer-motion"
+import type { Plan } from "@/types/pricing"
 
-const plans = [
+const plans: Plan[] = [
   {
     name: "Free Plan",
-    price: "0",
+    price: "Free",
     features: [
       "Basic VPN Protection",
       "Limited Server Locations",
@@ -19,14 +22,6 @@ const plans = [
   },
   {
     name: "Premium Plan",
-    price: "10 Tokens",
-    features: [
-      "Advanced VPN Protection",
-      "All Server Locations",
-      "Ultra-Fast Speed",
-      "Advanced Security Suite",
-      "Priority Support 24/7",
-    ],
     buttonClass: "bg-[#40C057] hover:bg-[#40C057]/90",
     cardClass: "bg-[#0B1221] border-2 border-[#40C057]",
     badge: "Most Popular",
@@ -34,6 +29,13 @@ const plans = [
 ]
 
 export function Pricing() {
+  const [isWalletConnected, setIsWalletConnected] = useState(false)
+
+  const handleConnectWallet = () => {
+    // Implement your wallet connection logic here
+    setIsWalletConnected(true)
+  }
+
   return (
     <div className="pricing-background py-20 relative overflow-hidden">
       <div className="perspective-grid opacity-30"></div>
@@ -50,9 +52,11 @@ export function Pricing() {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
-            <div
+            <motion.div
               key={plan.name}
-              className={`${plan.cardClass} rounded-2xl p-8 space-y-6 relative overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-glow`}
+              className={`${plan.cardClass} rounded-2xl p-8 space-y-6 relative overflow-hidden`}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
             >
               {/* Popular Badge */}
               <div className="absolute top-6 right-6">
@@ -61,38 +65,43 @@ export function Pricing() {
 
               <div className="space-y-2">
                 <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                <p className="text-sm text-gray-400">What you will get in this plan</p>
+                {index === 0 && plan.price && (
+                  <p className="text-3xl font-bold text-[#40C057] glow-text">{plan.price}</p>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-baseline gap-1">
-                  {plan.price === "0" ? (
-                    <span className="text-5xl font-bold text-[#40C057] glow-text">Free</span>
-                  ) : (
-                    <>
-                      <span className="text-5xl font-bold text-[#40C057] glow-text">{plan.price}</span>
-                      <span className="text-lg text-gray-400">/month</span>
-                    </>
+              {index === 0 ? (
+                <>
+                  {plan.features && (
+                    <ul className="space-y-4">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center text-gray-300">
+                          <Check className="w-5 h-5 mr-3 text-[#40C057]" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
+                  <button
+                    className={`${plan.buttonClass} w-full py-3 rounded-lg text-white font-medium transition-colors hover:shadow-glow-sm`}
+                  >
+                    Get Started Free
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold text-white">Get Premium</h4>
+                  <p className="text-sm text-gray-400">Connect your wallet to prove your holdings of $XYZ token</p>
+                  <button
+                    onClick={handleConnectWallet}
+                    className={`${plan.buttonClass} w-full py-3 rounded-lg text-white font-medium transition-colors hover:shadow-glow-sm flex items-center justify-center gap-2`}
+                  >
+                    <Wallet className="w-5 h-5" />
+                    {isWalletConnected ? "Wallet Connected" : "Connect Wallet"}
+                  </button>
                 </div>
-               
-              </div>
-
-              <ul className="space-y-4">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center text-gray-300">
-                    <Check className="w-5 h-5 mr-3 text-[#40C057]" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                className={`${plan.buttonClass} w-full py-3 rounded-lg text-white font-medium transition-colors hover:shadow-glow-sm`}
-              >
-                {index === 0 ? "Get Started Free" : "Get Premium Access"}
-              </button>
-            </div>
+              )}
+            </motion.div>
           ))}
         </div>
       </div>
